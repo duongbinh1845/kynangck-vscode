@@ -1,0 +1,6 @@
+{
+  "name": "Giáo Dục Kỹ Năng Trẻ Em",
+  "description": "Nền tảng giáo dục kỹ năng cho trẻ em tích hợp trò chơi tương tác, quản lý dự án, bài viết phương pháp hiện đại và hệ thống CRM quản lý đăng ký, học viên và doanh nghiệp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
