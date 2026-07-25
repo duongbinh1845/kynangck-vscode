@@ -1372,8 +1372,8 @@ export function writeDb(data: DBData) {
       keys.map(async (key) => {
         try {
           const val = data[key] !== undefined ? data[key] : (key === 'cms' ? {} : []);
-          const { error } = await supabaseClient!
-            .from('app_state')
+          const { error } = await (supabaseClient!
+            .from('app_state') as any)
             .upsert({ key, data: val }, { onConflict: 'key' });
           if (error) console.error(`Supabase upsert failed for ${key}:`, error.message);
         } catch (err) {
@@ -1402,9 +1402,9 @@ export async function syncDbWithSupabase(): Promise<void> {
   ];
 
   // Read all rows from Supabase
-  const { data: rows, error } = await supabaseClient
+  const { data: rows, error } = await (supabaseClient
     .from('app_state')
-    .select('key, data');
+    .select('key, data') as any);
 
   if (error) {
     console.error('Error reading from Supabase:', error.message);
@@ -1412,7 +1412,8 @@ export async function syncDbWithSupabase(): Promise<void> {
     return;
   }
 
-  const hasCloudData = rows && rows.length > 0;
+  const typedRows = (rows || []) as { key: string; data: any }[];
+  const hasCloudData = typedRows.length > 0;
 
   if (!hasCloudData) {
     // First run: upload local mock data to Supabase
@@ -1420,8 +1421,8 @@ export async function syncDbWithSupabase(): Promise<void> {
     for (const key of keys) {
       try {
         const val = currentDb[key] !== undefined ? currentDb[key] : (key === 'cms' ? {} : []);
-        const { error: upsertErr } = await supabaseClient
-          .from('app_state')
+        const { error: upsertErr } = await (supabaseClient
+          .from('app_state') as any)
           .upsert({ key, data: val }, { onConflict: 'key' });
         if (upsertErr) {
           console.error(`Error uploading ${key}:`, upsertErr.message);
@@ -1437,7 +1438,7 @@ export async function syncDbWithSupabase(): Promise<void> {
     console.log('Loaded data from Supabase. Merging...');
     const tempDb: Partial<DBData> = {};
     for (const key of keys) {
-      const row = rows.find(r => r.key === key);
+      const row = typedRows.find(r => r.key === key);
       if (row && row.data !== undefined && row.data !== null) {
         (tempDb as any)[key] = row.data;
       } else {
