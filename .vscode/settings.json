@@ -1,0 +1,6 @@
+{
+    "editor.columnSelection": true,
+    "chat.mcp.discovery.enabled": {
+        "claude-desktop": true
+    }
+}
