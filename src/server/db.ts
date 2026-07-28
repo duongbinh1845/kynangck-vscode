@@ -1385,6 +1385,39 @@ export function writeDb(data: DBData) {
 }
 
 export async function syncDbWithSupabase(): Promise<void> {
+  if (!supabaseClient) {
+    console.log('⚠ Supabase not configured, skipping sync');
+    return;
+  }
+
+  try {
+    console.log('🔄 Syncing database with Supabase...');
+    const keysToSync = ['projects', 'news', 'cms', 'parents', 'corporates', 'transactions', 'notifications'];
+
+    const { data, error } = await (supabaseClient.from('app_state') as any)
+      .select('key, data')
+      .in('key', keysToSync);
+
+    if (error) {
+      console.error('❌ Supabase sync error:', error);
+      return;
+    }
+
+    let localDb = getDb();
+
+    data?.forEach((row: any) => {
+      if (row.key && row.data) {
+        localDb[row.key as keyof DBData] = row.data;
+        console.log(`✓ Synced ${row.key} from Supabase`);
+      }
+    });
+
+    inMemoryDbCache = localDb;
+    console.log('✅ Database synced successfully');
+  } catch (err) {
+    console.error('❌ Sync failed:', err);
+  }
+}
   ensureDb();
 
   if (!isSupabaseEnabled || !supabaseClient) {

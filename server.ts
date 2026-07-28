@@ -1143,8 +1143,10 @@ if (process.env.NODE_ENV !== 'production') {
       });
     });
   }).catch((err) => {
-    console.error('Lỗi khi đồng bộ cơ sở dữ liệu Firebase lúc khởi động:', err);
+    console.error('Lỗi khi đồng bộ cơ sở dữ liệu:', err);
   });
+
+  syncDbWithSupabase().catch(err => console.error('⚠ Initial Supabase sync failed:', err));
 } else {
   syncDbWithSupabase().then(() => {
     const distPath = path.join(process.cwd(), 'dist');
