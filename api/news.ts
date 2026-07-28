@@ -87,6 +87,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const news = await getDataFromSupabase('news');
 
   if (req.method === 'POST') {
+    console.log('[DEBUG] POST /api/news payload:', JSON.stringify(req.body, null, 2));
+
     const newArticle = {
       id: `art-${Date.now().toString().slice(-6)}`,
       title: req.body.title,
@@ -100,8 +102,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       author: req.body.author || 'Chuyên gia KynangCK'
     };
 
+    console.log('[DEBUG] Saving article:', JSON.stringify(newArticle, null, 2));
+
     const updatedNews = [newArticle, ...news];
     await updateDataInSupabase('news', updatedNews);
+
+    console.log('[DEBUG] Article saved to Supabase');
     return res.status(201).json(newArticle);
   }
 
